@@ -34,5 +34,7 @@ cp target/release/anime-cli ~/.local/bin/anime-cli
 ```
 (Make sure ~/.local/bin is added to your shell's $PATH)
 
+## Installation by .sh sript
+**Under construction**
 
 ***AI only used for help text***
