@@ -1,4 +1,3 @@
-use core::fmt;
 use rusqlite::{Connection, Result as ResultSql};
 use comfy_table::Table;
 use std::env;
@@ -19,12 +18,6 @@ impl Anime {
             num_ep: n_ep,
             cur_ep: 0,
         }
-    }
-}
-
-impl fmt::Display for Anime {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Anime: {}, Eps: {}", self.nome, self.num_ep)
     }
 }
 
