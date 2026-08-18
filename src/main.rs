@@ -5,7 +5,7 @@ use rusqlite::Result as ResultSql;
 use db::{Anime};
 
 const HELP_TEXT: &str = "\
-Usage: cargo run -- <COMMAND> <ANIME_NAME> [ARGS]
+Usage: anime-cli <COMMAND> <ANIME_NAME> [ARGS]
 
 Commands:
   add <name> <total_eps>   Adds a new anime to the database.
