@@ -1,5 +1,5 @@
-use rusqlite::{Connection, Result as ResultSql};
 use comfy_table::Table;
+use rusqlite::{Connection, Result as ResultSql};
 use std::env;
 use std::fs;
 use std::path::PathBuf;
@@ -49,7 +49,7 @@ pub fn add_data(conn: &Connection, anime: &mut Anime) -> ResultSql<bool> {
         "INSERT OR IGNORE INTO anime (name, episodios, current_ep) VALUES (?1,?2,?3)",
         rusqlite::params![anime.nome, anime.num_ep, anime.cur_ep],
     )?;
-    
+
     if lines > 0 {
         let generated_id = conn.last_insert_rowid() as u32;
         anime.id = Some(generated_id);
@@ -70,15 +70,20 @@ pub fn show_db(conn: &Connection) -> ResultSql<()> {
             row.get::<_, u32>(3)?,
         ))
     })?;
-    
+
     let mut table = Table::new();
-    table.set_header(vec!["ID", "Name","Current_Ep","Episodes"]);
-    
+    table.set_header(vec!["ID", "Name", "Current_Ep", "Episodes"]);
+
     for anime in anime_iter {
-        let (id, nome,cur_eps, eps) = anime?;
-        table.add_row(vec![id.to_string(), nome,cur_eps.to_string(), eps.to_string()]);
+        let (id, nome, cur_eps, eps) = anime?;
+        table.add_row(vec![
+            id.to_string(),
+            nome,
+            cur_eps.to_string(),
+            eps.to_string(),
+        ]);
     }
-    
+
     println!("{table}");
     Ok(())
 }
@@ -112,22 +117,19 @@ pub fn search_ani(conn: &Connection, termo: &str) -> ResultSql<Anime> {
     }
 }
 
-pub fn update_ep(conn: &Connection, ani: &mut Anime, seen_eps: u32) -> ResultSql<()>{
+pub fn update_ep(conn: &Connection, ani: &mut Anime, seen_eps: u32) -> ResultSql<()> {
     ani.cur_ep += seen_eps;
-    conn.execute("UPDATE anime SET current_ep = ?1 WHERE id = ?2 OR name = ?3",
-     rusqlite::params![ani.cur_ep, ani.id, ani.nome],
+    conn.execute(
+        "UPDATE anime SET current_ep = ?1 WHERE id = ?2 OR name = ?3",
+        rusqlite::params![ani.cur_ep, ani.id, ani.nome],
     )?;
     Ok(())
 }
 
-pub fn remove_ani(conn: &Connection, ani: &Anime) -> ResultSql<bool>{
-    let lines = conn.execute("DELETE FROM anime WHERE id = ?1 OR name = ?2",
-     rusqlite::params![ani.id,ani.nome],
+pub fn remove_ani(conn: &Connection, ani: &Anime) -> ResultSql<bool> {
+    let lines = conn.execute(
+        "DELETE FROM anime WHERE id = ?1 OR name = ?2",
+        rusqlite::params![ani.id, ani.nome],
     )?;
-    if lines > 0{
-        Ok(true)
-    }
-    else {
-        Ok(false)
-    }
+    if lines > 0 { Ok(true) } else { Ok(false) }
 }

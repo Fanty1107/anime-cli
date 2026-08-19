@@ -1,88 +1,54 @@
+mod cli;
 mod db;
-use std::{env, io, process};
+use cli::{HELP_TEXT, add_ani, check_rm, get_input_eps, print_err};
+use db::Anime;
 use rusqlite::Result as ResultSql;
+use std::env;
 
-use db::{Anime};
-
-const HELP_TEXT: &str = "\
-Usage: anime-cli <COMMAND> <ANIME_NAME> [ARGS]
-
-Commands:
-  add <name> <total_eps>   Adds a new anime to the database.
-  up <name>                Updates the watched episodes for a specific anime.
-  rm <name>                Removes an anime from the database.
-  show/-s                  Show the local database. 
-
-Examples:
-  anime-cli add \"One Piece\" 1070
-  *****     up \"Naruto\"
-  *****     up \"id_anime\"  
-  *****     rm \"Bleach\"
-  *****     rm \"id_anime\" 
-  *****     show/-s
-  ";
-
-fn main()-> ResultSql<()>{
+use crate::cli::{COMMUN_PATH, check_db_path};
+/* cli file: functions related to cli in memory insted db
+ * db file: functions related to database and the struct Anime
+ * main file: functions related to read args and control flow
+ */
+fn main() -> ResultSql<()> {
     let args: Vec<String> = env::args().collect();
     let connec = db::new_db()?;
-    db::init_db(&connec)?; 
+    db::init_db(&connec)?;
     match args.len() {
         4 => {
             let opt: &str = &args[1];
             let anime_name: &str = &args[2];
             let num_ep: u32 = args[3].parse().unwrap_or(0);
-            match opt{
-                "add" =>{
+            match opt {
+                "add" => {
                     let mut ani = Anime::new(anime_name, num_ep);
-                    let insert_ani = db::add_data(&connec, &mut ani)?;
-                    if insert_ani{
-                        db::show_db(&connec)?;
-                    }else {
-                        println!("Anime already exists in your database: {}", ani.nome);
-                    }
-                },
-                _ => {
-                    eprintln!("Error: command unknow");
-                    eprintln!("Use 'anime help' to see the available commands");
-                    process::exit(1);
+                    add_ani(&connec, &mut ani)?;
                 }
+                _ => print_err(),
             }
-        },
-        3 =>{
+        }
+        3 => {
             let opt: &str = &args[1];
             let anime_name: &str = &args[2];
             match db::search_ani(&connec, anime_name) {
-               Ok(mut anime) => match opt {
-                   "up" =>{
-                        println!("Enter the number of epsodes seen: ");
-                        let mut input = String::new();
-                        io::stdin()
-                        .read_line(&mut input)
-                        .expect("Error enter a valide number");
-
-                        let num_seen: u32 = input.trim().parse().expect("Erro ao converter");
+                Ok(mut anime) => match opt {
+                    "up" => {
+                        let num_seen: u32 = get_input_eps();
                         db::update_ep(&connec, &mut anime, num_seen)?;
-                        db::show_db(&connec)?; 
-                   },
-                   "rm" =>{
+                        db::show_db(&connec)?;
+                    }
+                    "rm" => {
                         let deleted_item = db::remove_ani(&connec, &anime)?;
-                        if deleted_item{
-                            println!("Anime '{}' removed successfully", anime.nome);
-                            db::show_db(&connec)?;
-                        }
-                        else{
-                            println!("Error: unable to remove the anime.");
-                        }
-                   },
-                   _ => {
-                    eprintln!("Error: command unknow");
-                    eprintln!("Use 'anime help' to see the available commands");
-                    process::exit(1);
+                        //if else statement in cli.rs 46 ->
+                        check_rm(deleted_item, &connec, &anime.nome)?;
+                    }
+                    _ => print_err(),
+                },
+                Err(_) => {
+                    println!(
+                        "Anime not found in database, make sure you entered the correct name or id"
+                    );
                 }
-               }
-               Err(_) =>{
-                println!("Anime not found in database, make sure you entered the correct name or id");
-               }
             }
         }
         2 => {
@@ -94,24 +60,24 @@ fn main()-> ResultSql<()>{
                 "-s" => {
                     db::show_db(&connec)?;
                 }
-                "-h" =>{
+
+                "-Sd" => {
+                    if check_db_path() {
+                        println!("Path to dabase.db: {}", COMMUN_PATH);
+                    } else {
+                        println!("Error {} not found", COMMUN_PATH);
+                    }
+                }
+                "-h" => {
                     println!("{}", HELP_TEXT);
                 }
-                "help" =>{
+                "help" => {
                     println!("{}", HELP_TEXT);
                 }
-                _ => {
-                    eprintln!("Error: command unknow");
-                    eprintln!("Use 'anime help' to see the available commands");
-                    process::exit(1);
-                }
+                _ => print_err(),
             }
         }
-        _ => {
-                eprintln!("Error: command unknow");
-                eprintln!("Use 'anime help' to see the available commands");
-                process::exit(1);
-        }
+        _ => print_err(),
     }
     Ok(())
 }
