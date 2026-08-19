@@ -36,6 +36,8 @@ cp target/release/anime-cli ~/.local/bin/anime-cli
 (Make sure ~/.local/bin is added to your shell's $PATH)
 
 ## Installation by .sh sript
-**Under construction**
+```bash
+curl -sSfL https://raw.githubusercontent.com/Fanty1107/anime-cli/main/install.sh | bash
+```
 
 ***AI only used for help text***
