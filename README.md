@@ -3,7 +3,8 @@
 A lightweight, fast, and simple command-line interface tool to track your anime episodes directly from your terminal.
 
 ## Example
-<img width="933" height="771" alt="image" src="https://github.com/user-attachments/assets/c9c6ad3f-08d2-4f60-b2f0-ea594940cf0e" />
+<img width="1009" height="718" alt="Captura_de_tela_20260818_212848" src="https://github.com/user-attachments/assets/fa2bf0d1-6cba-4c59-9a32-94aa0be1f52c" />
+
 
 ## Features
 - **Offline by default:** Zero internet access required. Everything runs locally.
