@@ -9,7 +9,8 @@ Usage: anime-cli <COMMAND> <ANIME_NAME> [ARGS]
 
 Commands:
   add <name> <total_eps>   Adds a new anime to the database.
-  up <name>                Updates the watched episodes for a specific anime.
+  up <name>                Get input for updates the watched episodes for a specific anime.
+  up <name> <add_eps>      Updates the Current_Ep with the args directly
   rm <name>                Removes an anime from the database.
   show/-s                  Show the local database.
   -Sd                      Show database file location

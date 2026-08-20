@@ -8,6 +8,9 @@ use std::env;
 /* cli file: functions related to cli in memory insted db
  * db file: functions related to database and the struct Anime
  * main file: functions related to read args and control flow
+ *
+ *
+ * TODO: Option for outdated a current_ep, and max Current_ep with Episodes with max or flag -M
  */
 fn main() -> ResultSql<()> {
     let args: Vec<String> = env::args().collect();
@@ -15,13 +18,17 @@ fn main() -> ResultSql<()> {
     init_db(&connec)?;
     match args.len() {
         4 => {
-            let opt: &str = &args[1];
-            let anime_name: &str = &args[2];
-            let num_ep: u32 = args[3].parse().unwrap_or(0);
+            let (opt, anime_name, num_ep): (&str, &str, u32) =
+                (&args[1], &args[2], args[3].parse().unwrap_or(0));
             match opt {
                 "add" => {
                     let mut ani = Anime::new(anime_name, num_ep);
                     add_ani(&connec, &mut ani)?;
+                }
+                "up" => {
+                    let mut anime_up = search_ani(&connec, anime_name).unwrap();
+                    update_ep(&connec, &mut anime_up, num_ep)?;
+                    show_db(&connec)?;
                 }
                 _ => print_err(),
             }
