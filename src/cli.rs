@@ -1,5 +1,5 @@
+use crate::Anime;
 use crate::db;
-use db::Anime;
 use rusqlite::{Connection, Result as ResultSql};
 use std::{env, io, path::Path, process};
 

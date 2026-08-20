@@ -1,19 +1,18 @@
-mod cli;
-mod db;
-use cli::{HELP_TEXT, add_ani, check_rm, get_input_eps, print_err};
-use db::Anime;
+use anime_cli::{
+    Anime, COMMUN_PATH, HELP_TEXT, add_ani, check_db_path, check_rm, get_input_eps, init_db,
+    new_db, print_err, remove_ani, search_ani, show_db, update_ep,
+};
 use rusqlite::Result as ResultSql;
 use std::env;
 
-use crate::cli::{COMMUN_PATH, check_db_path};
 /* cli file: functions related to cli in memory insted db
  * db file: functions related to database and the struct Anime
  * main file: functions related to read args and control flow
  */
 fn main() -> ResultSql<()> {
     let args: Vec<String> = env::args().collect();
-    let connec = db::new_db()?;
-    db::init_db(&connec)?;
+    let connec = new_db()?;
+    init_db(&connec)?;
     match args.len() {
         4 => {
             let opt: &str = &args[1];
@@ -30,15 +29,15 @@ fn main() -> ResultSql<()> {
         3 => {
             let opt: &str = &args[1];
             let anime_name: &str = &args[2];
-            match db::search_ani(&connec, anime_name) {
+            match search_ani(&connec, anime_name) {
                 Ok(mut anime) => match opt {
                     "up" => {
                         let num_seen: u32 = get_input_eps();
-                        db::update_ep(&connec, &mut anime, num_seen)?;
-                        db::show_db(&connec)?;
+                        update_ep(&connec, &mut anime, num_seen)?;
+                        show_db(&connec)?;
                     }
                     "rm" => {
-                        let deleted_item = db::remove_ani(&connec, &anime)?;
+                        let deleted_item = remove_ani(&connec, &anime)?;
                         //if else statement in cli.rs 46 ->
                         check_rm(deleted_item, &connec, &anime.nome)?;
                     }
@@ -55,10 +54,10 @@ fn main() -> ResultSql<()> {
             let opt: &str = &args[1];
             match opt {
                 "show" => {
-                    db::show_db(&connec)?;
+                    show_db(&connec)?;
                 }
                 "-s" => {
-                    db::show_db(&connec)?;
+                    show_db(&connec)?;
                 }
 
                 "-Sd" => {

@@ -1,26 +1,9 @@
+use crate::Anime;
 use comfy_table::Table;
 use rusqlite::{Connection, Result as ResultSql};
 use std::env;
 use std::fs;
 use std::path::PathBuf;
-pub struct Anime {
-    pub id: Option<u32>,
-    pub nome: String,
-    pub num_ep: u32,
-    pub cur_ep: u32,
-}
-
-impl Anime {
-    pub fn new(n: &str, n_ep: u32) -> Self {
-        Self {
-            id: None,
-            nome: n.to_string(),
-            num_ep: n_ep,
-            cur_ep: 0,
-        }
-    }
-}
-
 pub fn new_db() -> ResultSql<Connection> {
     let home_dir = env::var("HOME").expect("Error: directory home not found");
     let mut db_dir = PathBuf::from(home_dir);
