@@ -3,8 +3,8 @@ use crate::db;
 use rusqlite::{Connection, Result as ResultSql};
 use std::{env, io, path::Path, process};
 
-pub const COMMUN_PATH: &str = "~/.anime_cli/database.db";
-pub const HELP_TEXT: &str = "\
+pub const COMMUN_PATH: &'static str = "~/.anime_cli/database.db";
+pub const HELP_TEXT: &'static str = "\
 Usage: anime-cli <COMMAND> <ANIME_NAME> [ARGS]
 
 Commands:
