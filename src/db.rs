@@ -1,5 +1,7 @@
 use crate::Anime;
+use comfy_table::ContentArrangement;
 use comfy_table::Table;
+use comfy_table::*;
 use rusqlite::{Connection, Result as ResultSql};
 use std::env;
 use std::fs;
@@ -55,15 +57,16 @@ pub fn show_db(conn: &Connection) -> ResultSql<()> {
     })?;
 
     let mut table = Table::new();
-    table.set_header(vec!["ID", "Name", "Current_Ep", "Episodes"]);
+    table.set_header(vec!["ID", "Name", "Current_Ep", "Episodes"])
+        .set_content_arrangement(ContentArrangement::Dynamic);
 
     for anime in anime_iter {
         let (id, nome, cur_eps, eps) = anime?;
         table.add_row(vec![
-            id.to_string(),
-            nome,
-            cur_eps.to_string(),
-            eps.to_string(),
+            Cell::new(id.to_string()).add_attribute(Attribute::Bold),
+            Cell::new(nome).fg(Color::Red).add_attribute(Attribute::Italic),
+            Cell::new(cur_eps.to_string()).fg(Color::DarkRed).add_attribute(Attribute::Bold),
+            Cell::new(eps.to_string()).add_attribute(Attribute::Bold),
         ]);
     }
 
